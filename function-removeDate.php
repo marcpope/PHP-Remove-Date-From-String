@@ -1,35 +1,35 @@
 <?php
-/*
-
-this is not perfect, but this code will remove dates from a string. Useful for parsing podcasts
-where there is already a publish date inside the XML code and the title does not need a date.
-
-*/
-
+/**
+ * This function removes dates in various formats from a string.
+ * Useful for scenarios like parsing podcast titles where dates are redundant.
+ *
+ * @param string $input The input string potentially containing a date.
+ * @return string The input string with dates removed.
+ */
 function removeDate($input) {
-	$input = preg_replace('/(\d{4}[\.\/\-][01]\d[\.\/\-][0-3]\d)/', '', $input);
-	$input = preg_replace('/(January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}/', '', $input); 
-	$input = preg_replace('/(January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2} \d{4}/', '', $input); 
-	$input = preg_replace('/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{4}/', '', $input); 
-	$input = preg_replace('/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2} \d{4}/', '', $input); 
+    // Regular expression to match various date formats
+    $patterns = [
+        // YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD
+        '/\b\d{4}[\.\-\/][01]?\d[\.\-\/][0-3]?\d\b/',
+        // Month DD, YYYY and Month DD YYYY
+        '/\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{1,2},?\s\d{4}\b/',
+        // Mon DD, YYYY and Mon DD YYYY
+        '/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},?\s\d{4}\b/',
+        // DD Mon YYYY
+        '/\b\d{1,2}\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{4}\b/',
+        // DD.MM.YYYY, DD-MM-YYYY, DD/MM/YYYY
+        '/\b\d{1,2}[\.\-\/]\d{1,2}[\.\-\/]\d{2,4}\b/'
+    ];
+    
+    // Remove matched date patterns
+    $input = preg_replace($patterns, '', $input);
+    
+    // Optional: remove leading or trailing hyphens and colons left over from dates
+    $input = trim($input, " \t\n\r\0\x0B-:");
 
-	$input = preg_replace('/\d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}/', '', $input); 
-
-	$input = preg_replace('(\d{1,2}\.\d{2}\.\d{4})', '', $input);
-	$input = preg_replace('(\d{1,2}\.\d{2}\.\d{2})', '', $input);
-	$input = preg_replace('(\d{1,2}\-\d{2}\-\d{4})', '', $input);
-	$input = preg_replace('(\d{1,2}\-\d{2}\-\d{2})', '', $input);
-	
-/*
-this part is optional, it removes hyphens and colons in the beginning or end of the string
-in a title that are left over from the author that had added a date in a title
-  */
-  
-  $input = trim($input);
-	$input = trim($input,'-');
-  $input = trim($input,'-');
-	$input = trim($input);
-	
-	return($input);
-	
+    return $input;
 }
+
+// Example usage
+echo removeDate("Podcast Title - March 15, 2023 - Some Other Text");
+?>
